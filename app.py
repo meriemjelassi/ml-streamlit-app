@@ -2,38 +2,34 @@ import streamlit as st
 import joblib
 import numpy as np
 
-# Charger les objets entraînés
+# Charger les objets
 scaler = joblib.load("scaler.pkl")
 pca = joblib.load("pca.pkl")
 model = joblib.load("model.pkl")
 
-st.title("Application ML – Risque de Crédit")
+st.title("Application ML – Risque de crédit")
+st.write("Entrez les informations du client")
 
-st.write("Veuillez entrer les informations du client")
-
-# ⚠️ Ces variables DOIVENT correspondre à celles du notebook
+# 🔹 VARIABLES RÉELLES (exemples)
 age = st.number_input("Âge", min_value=18, max_value=100)
 income = st.number_input("Revenu annuel")
-loan_amnt = st.number_input("Montant du prêt")
-loan_percent_income = st.number_input("Pourcentage du revenu dédié au prêt")
-credit_history = st.number_input("Ancienneté du crédit (années)")
+loan_amount = st.number_input("Montant du prêt")
+loan_percent_income = st.number_input("Pourcentage du revenu")
 interest_rate = st.number_input("Taux d’intérêt")
-
-# ➕ compléter pour arriver EXACTEMENT au nombre de variables originales
-# Exemple fictif :
-var7 = st.number_input("Variable 7")
-var8 = st.number_input("Variable 8")
-var9 = st.number_input("Variable 9")
-var10 = st.number_input("Variable 10")
-var11 = st.number_input("Variable 11")
+credit_history = st.number_input("Historique de crédit")
+employment_years = st.number_input("Années d'emploi")
+home_ownership = st.number_input("Type de logement (encodé)")
+loan_intent = st.number_input("Intention du prêt (encodé)")
+grade = st.number_input("Grade du prêt")
+default_on_file = st.number_input("Défaut antérieur (0/1)")
 
 if st.button("Prédire le risque"):
-    # 1️⃣ données brutes (11 variables)
-    X = np.array([[age, income, loan_amnt, loan_percent_income,
-                   credit_history, interest_rate,
-                   var7, var8, var9, var10, var11]])
+    # 1️⃣ données brutes
+    X = np.array([[age, income, loan_amount, loan_percent_income,
+                   interest_rate, credit_history, employment_years,
+                   home_ownership, loan_intent, grade, default_on_file]])
 
-    # 2️⃣ standardisation
+    # 2️⃣ scaler
     X_scaled = scaler.transform(X)
 
     # 3️⃣ PCA
@@ -42,7 +38,4 @@ if st.button("Prédire le risque"):
     # 4️⃣ prédiction
     prediction = model.predict(X_pca)
 
-    if prediction[0] == 1:
-        st.error("⚠️ Client à risque de défaut")
-    else:
-        st.success("✅ Client solvable")
+    st.success(f"Résultat du modèle : {prediction[0]}")
